@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Face & Phone Detection</title>
+  <style>
+    body {
+      margin: 50px;
+      font-family: sans-serif;
+      background-color: #222;
+      color: #ddd;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      color: #f0f0f0;
+      margin-bottom: 20px;
+    }
+    #container {
+      position: relative;
+      width: 500px;
+      height: 375px;
+      background-color: #444;
+      border: 10px solid #222;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+    video, canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    #status {
+      margin-top: 15px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Face & Phone Detection</h1>
+  <div id="container">
+    <video id="videoElement" autoplay muted></video>
+    <canvas id="canvas"></canvas>
+  </div>
+  <div id="status">Memuat model...</div>
+
+  <!-- TFJS & COCO-SSD -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.21.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2"></script>
+
+  <!-- Alarm sound -->
+  <audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+
+  <script>
+    const video = document.getElementById('videoElement');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const statusText = document.getElementById('status');
+    const alarm = document.getElementById('alarm');
+
+    let model;
+    let running = false;
+    let phoneDetected = false;
+
+    // Setup kamera
+    async function setupCamera() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      video.srcObject = stream;
+      return new Promise(resolve => {
+        video.onloadedmetadata = () => {
+          resolve(video);
+        };
+      });
+    }
+    // Mulai deteksi
+    async function detectFrame() {
+      if (!running) return;
+      const predictions = await model.detect(video);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      phoneDetected = false;
+
+      predictions.forEach(pred => {
+        if (pred.score > 0.2) {
+          const [x, y, w, h] = pred.bbox;
+          ctx.strokeStyle = pred.class === 'cell phone' ? 'red' : 'lime';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(x, y, w, h);
+          ctx.fillStyle = 'yellow';
+          ctx.font = '16px sans-serif';
+          ctx.fillText(`${pred.class} ${(pred.score*100).toFixed(1)}%`, x, y > 20 ? y-5 : y+15);
+
+          // Jika HP & terdeteksi
+          if (pred.class === 'cell phone') {
+            phoneDetected = true;
+          }
+        }
+      });
+
+      if (phoneDetected) {
+        statusText.textContent = "⚠️ HP Terdeteksi!";
+        if (alarm.paused) {
+          alarm.play().catch(()=>{}); // play alarm
+        }
+      } else {
+        statusText.textContent = "✅ Tidak ada HP terdeteksi";
+        alarm.pause();
+        alarm.currentTime = 0;
+      }
+
+      requestAnimationFrame(detectFrame);
+    }
+
+    async function main() {
+      await setupCamera();
+      video.play();
+      model = await cocoSsd.load();
+      statusText.textContent = "Model siap. Mendeteksi...";
+      running = true;
+      detectFrame();
+    }
+
+    main();
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="tittle">Pomodoro Timer</h1>
+        <p class="timer" id="timer">25:00</p>
+        <div class="button-wrapper">
+            <button id="start">Start</button>
+            <button id="stop">Stop</button>
+            <button id="reset">Reset</button>
+            <button id="settime">SetTimer</button>
+          </div>
+    </div>
+
+  <!-- Alarm sound -->
+   <audio id="alarmSound" src="https://www.myinstants.com/en/instant/iphone-alarm-radar-45086/?utm_source=copy&utm_medium=share.ogg" preload="auto"></audio>
+
+    <script src="index.js"></script>
+    
+</body>
+</html>
+
+    <video id="video" width="400" height="300" autoplay muted></video>
+    <canvas id="overlay" width="400" height="300"></canvas>
+  </div>
+</body>
+</html>
+
+<!DOCTYPE html> 
+<html lang="id">
+   <head> 
+    <meta charset="UTF-8"> 
+    <link rel="stylesheet" href="style.css"> 
+    </head> 
+    <body>
+       <title>Contoh Ganti Warna Judul</title> 
+       <style> 
+       h1 {
+        color: #EFDFBB; 
+        text-align: center; 
+        font-family: Arial, sans-serif; 
+      }
+
+       </style> 
+      <body> 
+      <html>
+
+     
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E-Learning Sederhana</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #722F37;
+      color: #333;
+      padding: 30px;
+    }
+
+    h2 {
+      color: #EFDFBB;
+    }
+
+    input, textarea, select {
+      width: 300px;
+      padding: 10px;
+      margin: 5px 0;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #888;
+      font-style: italic;
+      opacity: 0.8;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: #3498db;
+      outline: none;
+      box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+    }
+
+    button {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      margin: 5px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #2980b9;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      background: #fff;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hapus {
+      background: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+      font-size: 12px;
+      transition: 0.3s;
+    }
+
+    .hapus:hover {
+      background: #c0392b;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Tambah Materi Baru</h2>
+
+  <!-- Pilihan Mapel -->
+  <select id="mapel">
+    <option value="">📚 Pilih Mapel...</option>
+    <option value="PU">PU</option>
+    <option value="PPU">PPU</option>
+    <option value="PBM">PBM</option>
+    <option value="PK">PK</option>
+    <option value="LBI">LBI</option>
+    <option value="LBE">LBE</option>
+    <option value="PM">PM</option>
+  </select>
+  <br>
+
+  <input type="text" id="judul" placeholder="✏️ Masukkan judul materi...">
+  <br>
+
+  <textarea id="isi" placeholder="📘 Tulis isi materi di sini..."></textarea>
+  <br>
+
+  <button onclick="tambahMateri()">Simpan Materi</button>
+  <button onclick="resetMateri()">Reset Semua Materi</button>
+
+  <h2>Daftar Materi</h2>
+  <ul id="daftarMateri"></ul>
+
+  <script>
+    // Ambil materi dari localStorage
+    let materi = JSON.parse(localStorage.getItem("materi")) || [];
+
+    function tampilkanMateri() {
+      const daftar = document.getElementById("daftarMateri");
+      daftar.innerHTML = "";
+
+      materi.forEach((item, index) => {
+        const li = document.createElement("li");
+
+        li.innerHTML = `
+          <span>
+            <strong>[${item.mapel}] ${item.judul}</strong><br>
+            ${item.isi}
+          </span>
+        `;
+
+        const tombolHapus = document.createElement("button");
+        tombolHapus.textContent = "❌";
+        tombolHapus.className = "hapus";
+        tombolHapus.onclick = () => hapusMateri(index);
+
+        li.appendChild(tombolHapus);
+        daftar.appendChild(li);
+      });
+    }
+
+    function tambahMateri() {
+      const mapel = document.getElementById("mapel").value;
+      const judul = document.getElementById("judul").value;
+      const isi = document.getElementById("isi").value;
+
+      if (!mapel) return alert("Pilih mapel dulu!");
+      if (!judul || !isi) return alert("Judul dan isi materi harus diisi!");
+
+      materi.push({ mapel, judul, isi });
+      localStorage.setItem("materi", JSON.stringify(materi));
+
+      tampilkanMateri();
+
+      alert("Materi berhasil disimpan!");
+
+      document.getElementById("mapel").value = "";
+      document.getElementById("judul").value = "";
+      document.getElementById("isi").value = "";
+    }
+
+    function hapusMateri(index) {
+      if (confirm("Yakin mau hapus materi ini?")) {
+        materi.splice(index, 1);
+        localStorage.setItem("materi", JSON.stringify(materi));
+        tampilkanMateri();
+      }
+    }
+
+    function resetMateri() {
+      if (confirm("Yakin hapus semua materi?")) {
+        materi = [];
+        localStorage.removeItem("materi");
+        tampilkanMateri();
+      }
+    }
+
+    tampilkanMateri();
+  </script>
+</body>
+</html>
+
+
+
+<script>
+  // Deteksi apakah perangkat HP
+  function isMobile() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  // Kalau HP, aktifkan pengawasan fokus
+  if (isMobile()) {
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        // Bikin notifikasi di layar (bukan alert biar nggak diblok browser)
+        let warn = document.createElement("div");
+        warn.textContent = "🚫 Jangan keluar dulu! Yuk fokus sampai timer habis 💪";
+        warn.style.position = "fixed";
+        warn.style.top = "0";
+        warn.style.left = "0";
+        warn.style.width = "100%";
+        warn.style.background = "red";
+        warn.style.color = "white";
+        warn.style.textAlign = "center";
+        warn.style.padding = "15px";
+        warn.style.fontSize = "18px";
+        warn.style.zIndex = "9999";
+        document.body.appendChild(warn);
+
+        // Hilangkan pesan setelah beberapa detik
+        setTimeout(() => {
+          warn.remove();
+        }, 3000);
+      }
+    });
+  } else {
+    console.log("Laptop terdeteksi — mode bebas aktif 😎");
+  }
+</script>
